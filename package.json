@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "ts-node src/index.ts",
-    "prod": "tsc && pm2 start dist/index.js"
+    "prod": "tsc && pm2 start dist/index.js --no-daemon"
   },
   "dependencies": {
     "@prisma/client": "5.15.0",

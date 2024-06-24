@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import express from "express";
 import cors from "cors";
 
+const port = process.env.PORT || 4000;
 const prisma = new PrismaClient();
 const app = express();
 
@@ -52,6 +53,4 @@ app.get("/buses", async (req, res) => {
   res.json(response);
 });
 
-app.listen(3000, () =>
-  console.log("🚀 Server ready at: http://localhost:3000")
-);
+app.listen(port, () => console.log(`Listening on port ${port}`));
