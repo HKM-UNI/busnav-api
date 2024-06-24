@@ -1,10 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import express from "express";
+import cors from "cors";
 
 const prisma = new PrismaClient();
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.get("/buses", async (req, res) => {
   const buses = await prisma.bus.findMany({
