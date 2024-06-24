@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model bus {
+  id                                    Int                 @id @default(autoincrement())
+  number                                Int                 @unique(map: "number") @db.SmallInt
+  average_time_minutes                  Int?                @db.UnsignedTinyInt
+  start_terminal                        Int?
+  end_terminal                          Int?
+  route_forward_data_url                String?             @db.VarChar(150)
+  route_backward_data_url               String?             @db.VarChar(150)
+  bus_stop_bus_start_terminalTobus_stop bus_stop?           @relation("bus_start_terminalTobus_stop", fields: [start_terminal], references: [id], onUpdate: Restrict, map: "bus_ibfk_1")
+  bus_stop_bus_end_terminalTobus_stop   bus_stop?           @relation("bus_end_terminalTobus_stop", fields: [end_terminal], references: [id], onUpdate: Restrict, map: "bus_ibfk_2")
+  bus_drivers                           bus_drivers[]
+  cooperative_buses                     cooperative_buses[]
+
+  @@index([end_terminal], map: "end_terminal")
+  @@index([start_terminal], map: "start_terminal")
+}
+
+model bus_cooperative {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique(map: "name") @db.VarChar(50)
+  description       String?             @db.VarChar(150)
+  cooperative_buses cooperative_buses[]
+}
+
+model bus_driver {
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(32)
+  bus_drivers bus_drivers[]
+}
+
+model bus_drivers {
+  id         Int        @id @default(autoincrement())
+  bus_id     Int
+  driver_id  Int
+  bus        bus        @relation(fields: [bus_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "bus_drivers_ibfk_1")
+  bus_driver bus_driver @relation(fields: [driver_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "bus_drivers_ibfk_2")
+
+  @@index([bus_id], map: "bus_id")
+  @@index([driver_id], map: "driver_id")
+}
+
+model bus_stop {
+  id                               Int     @id @default(autoincrement())
+  name                             String? @db.VarChar(32)
+  latitude                         Decimal @db.Decimal(9, 6)
+  longitude                        Decimal @db.Decimal(9, 6)
+  bus_bus_start_terminalTobus_stop bus[]   @relation("bus_start_terminalTobus_stop")
+  bus_bus_end_terminalTobus_stop   bus[]   @relation("bus_end_terminalTobus_stop")
+}
+
+model cooperative_buses {
+  id              Int             @id @default(autoincrement())
+  cooperative_id  Int
+  bus_id          Int
+  bus_cooperative bus_cooperative @relation(fields: [cooperative_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "cooperative_buses_ibfk_1")
+  bus             bus             @relation(fields: [bus_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "cooperative_buses_ibfk_2")
+
+  @@index([bus_id], map: "bus_id")
+  @@index([cooperative_id], map: "cooperative_id")
+}
