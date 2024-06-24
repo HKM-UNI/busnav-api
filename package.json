@@ -4,12 +4,14 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node src/index.ts"
+    "dev": "ts-node src/index.ts",
+    "prod": "tsc && pm2 start dist/index.js"
   },
   "dependencies": {
     "@prisma/client": "5.15.0",
     "cors": "^2.8.5",
-    "express": "4.19.2"
+    "express": "4.19.2",
+    "pm2": "^5.4.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
