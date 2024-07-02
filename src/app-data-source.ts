@@ -14,6 +14,7 @@ const dataSource = new DataSource({
   entities: [e.Bus, e.BusCooperative, e.BusDriver, e.BusPath, e.BusStop],
   synchronize: !!process.env.TORM_SYNC || false,
   logging: !!process.env.TORM_LOGGING || false,
+  legacySpatialSupport: false
 });
 
 export default dataSource;
