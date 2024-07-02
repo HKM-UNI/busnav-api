@@ -1,56 +1,24 @@
-import { PrismaClient } from "@prisma/client";
-import express from "express";
+import "reflect-metadata";
+
 import cors from "cors";
+import express from "express";
+import datasource from "./app-data-source";
+import { buses_router, routes_router } from "./routes";
 
-const port = process.env.PORT || 4000;
-const prisma = new PrismaClient();
-const app = express();
+datasource
+  .initialize()
+  .then(() => {
+    const port = process.env.PORT || 4000;
+    const app = express();
 
-app.use(express.json());
-app.use(cors());
+    app.use(express.json());
+    app.use(cors());
 
-app.get("/buses", async (req, res) => {
-  const buses = await prisma.bus.findMany({
-    include: {
-      bus_drivers: {
-        select: {
-          bus_driver: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      },
-      bus_stop_bus_start_terminalTobus_stop: true,
-      bus_stop_bus_end_terminalTobus_stop: true,
-      cooperative_buses: {
-        select: {
-          bus_cooperative: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      },
-    },
+    app.use("/buses", buses_router);
+    app.use("/routes", routes_router);
+
+    app.listen(port, () => console.log(`Listening on port ${port}`));
+  })
+  .catch((err) => {
+    console.error("Error during Data Source initialization:", err);
   });
-
-  const response = {
-    buses: [
-      buses.map((b) => ({
-        id: b.id,
-        name: `Ruta ${b.number}`,
-        number: b.number,
-        cooperative: b.cooperative_buses[0].bus_cooperative.name,
-        owners: b.bus_drivers.map((d) => d.bus_driver.name),
-        terminal1: b.bus_stop_bus_start_terminalTobus_stop,
-        terminal2: b.bus_stop_bus_end_terminalTobus_stop,
-        geojson_terminal1_to_terminal2: b.route_forward_data_url,
-        geojson_terminal2_to_terminal1: b.route_backward_data_url,
-      })),
-    ],
-  };
-  res.json(response);
-});
-
-app.listen(port, () => console.log(`Listening on port ${port}`));
