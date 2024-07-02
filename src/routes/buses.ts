@@ -46,6 +46,7 @@ buses_router.get("", async (req, res) => {
 
   const response = {
     ok: true,
+    code: 200,
     message: "ok",
     data: response_data,
   };
