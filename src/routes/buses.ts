@@ -30,19 +30,17 @@ buses_router.get("", async (req, res) => {
     .innerJoinAndSelect("b.endTerminal", "et")
     .getMany();
 
-  const response_data = [
-    buses.map((b) => ({
-      id: b.id,
-      name: `Ruta ${b.number}`,
-      number: b.number,
-      cooperative: b.cooperative.name,
-      owners: b.drivers.map((d) => d.name),
-      terminal1: b.startTerminal.toFrontendModel(),
-      terminal2: b.endTerminal.toFrontendModel(),
-      geojson_terminal1_to_terminal2: mock_geo_jsons[b.number].forward,
-      geojson_terminal2_to_terminal1: mock_geo_jsons[b.number].backward,
-    })),
-  ];
+  const response_data = buses.map((b) => ({
+    id: b.id,
+    name: `Ruta ${b.number}`,
+    number: b.number,
+    cooperative: b.cooperative.name,
+    owners: b.drivers.map((d) => d.name),
+    terminal1: b.startTerminal.toFrontendModel(),
+    terminal2: b.endTerminal.toFrontendModel(),
+    geojson_terminal1_to_terminal2: mock_geo_jsons[b.number].forward,
+    geojson_terminal2_to_terminal1: mock_geo_jsons[b.number].backward,
+  }));
 
   const response = {
     ok: true,
